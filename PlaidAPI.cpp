@@ -4,12 +4,16 @@
 
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
+
+
 using namespace cpr;
 using namespace std;
 using namespace nlohmann;
 
+
 string clientID;
 string productionSecret;
+
 
 void plaid_initialize(){
     fstream file("/home/trevor/MEGA/Finances/Code/Transactions/plaid.json");
@@ -67,7 +71,7 @@ PlaidTransactionsResponse call_transactions(){
     file << setw(4) << jsend;
     file.close();
     if (response.accounts.size() > 0 ){
-        cout << "Available: "<< response.accounts[0].balances.available << endl <<  "Current: " <<response.accounts[0].balances.current << endl << endl;
+        cout << "Available: " << response.accounts[0].balances.available << endl <<  "Current: " << response.accounts[0].balances.current << endl << endl;
     }
 
 

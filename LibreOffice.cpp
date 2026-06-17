@@ -1,6 +1,5 @@
 #include "PlaidJson.hpp"
 
-
 #include <cppuhelper/bootstrap.hxx>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
 #include <com/sun/star/frame/XComponentLoader.hpp>
@@ -15,6 +14,8 @@
 #include <com/sun/star/util/XNumberFormatsSupplier.hpp>
 #include <com/sun/star/beans/XFastPropertySet.hpp>
 #include <com/sun/star/sheet/XCellSeries.hpp>
+
+
 using namespace css;
 using namespace css;
 using namespace uno;
@@ -25,6 +26,7 @@ using namespace beans;
 using namespace table;
 using namespace util;
 using namespace rtl;
+
 
 static const int DATE_COLUMN                    = 0;
 static const int NAME_COLUMN                    = 1;
@@ -38,12 +40,13 @@ static const int LAST_COLUMN_INDEX              = 7;
 
 static const int START_ROW                      = 1;
 
+
 void set_row(Sequence<Any>& row, const Transaction trans );
 void modify_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
 void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTransaction> transactions);
 void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
-
 void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account);
+
 string cell_address_from_index(int row, int col);
 Reference<XSpreadsheet> get_spreadsheet();
 
@@ -115,7 +118,6 @@ void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account){
 }
 
 void modify_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<Transaction> transactions){
-
     vector<RemovedTransaction> removedTransactions = vector<RemovedTransaction>();
     for (int i = 0; i < transactions.size(); ++i){
         removedTransactions.emplace_back(RemovedTransaction{
@@ -126,6 +128,7 @@ void modify_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<Transaction>
     delete_rows(xSpreadsheet, removedTransactions);
     insert_rows(xSpreadsheet, transactions);
 }
+
 void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTransaction> transactions){
     Reference<XSheetCellCursor> xCursor = xSpreadsheet->createCursor();
     Reference<XUsedAreaCursor> xUsedCursor(xCursor, UNO_QUERY_THROW);
@@ -167,8 +170,6 @@ void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTrans
 }
 
 void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions){
-
-
 
     //Sort Transactions by date
     std::sort(transactions.begin(), transactions.end(), is_transaction_later);
@@ -248,7 +249,6 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
     catch(RuntimeException e){
         cout << "error: " << e.Message << endl;
     }
-
 
 }
 
