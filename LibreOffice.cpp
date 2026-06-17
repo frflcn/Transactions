@@ -42,7 +42,7 @@ void set_row(Sequence<Any>& row, const Transaction trans );
 void modify_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
 void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTransaction> transactions);
 void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
-void format(Reference<XSpreadsheetDocument> xSpreadsheetDocument, const Reference<XSpreadsheet> xSpreadsheet);
+
 void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account);
 string cell_address_from_index(int row, int col);
 Reference<XSpreadsheet> get_spreadsheet();
@@ -60,12 +60,6 @@ void add_transactions(PlaidTransactionsResponse response){
         if (response.accounts.size() > 0){
             add_balance(xSpreadsheet, response.accounts[0]);
         }
-
-
-
-        //format(xSpreadsheetDoc, xSpreadsheet);
-
-
 
 }
 
@@ -260,96 +254,6 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
 
 
 }
-void format(Reference<XSpreadsheetDocument> xSpreadsheetDocument, const Reference<XSpreadsheet> xSpreadsheet){
-
-    Reference<XNumberFormatsSupplier> xNumberFormatSupplier(xSpreadsheetDocument, UNO_QUERY_THROW);
-    Reference<XNumberFormats> xNumberFormats = xNumberFormatSupplier->getNumberFormats();
-    lang::Locale locale;
-    Sequence<sal_Int32> keys = xNumberFormats->queryKeys(8, locale, false);
-    cout << std::format("Length: {}", keys.getLength()) << endl;
-    OUString strProp;
-    sal_Bool boolProp;
-    short shortProp;
-    Reference<XPropertySet> xPropertySet;
-    // for (int i = 0 ; i <  keys.getLength(); i++){
-    //     xPropertySet = xNumberFormats->getByKey(keys[i]);
-    //     //Reference<XFastPropertySet> xFastPropertySet(xPropertySet, UNO_QUERY_THROW);
-
-    //     Sequence<Property> properties =  xPropertySet->getPropertySetInfo()->getProperties();
-    //     for(int j = 0; j <  properties.getLength(); j++){
-    //         Any any = xPropertySet->getPropertyValue(properties[j].Name);
-    //         if (any >>= strProp){
-
-    //             cout << std::format("{} : {} : string", OUStringToOString(properties[j].Name, RTL_TEXTENCODING_UTF8).getStr(), OUStringToOString(strProp, RTL_TEXTENCODING_UTF8).getStr()) << endl;
-
-    //         }else if(any >>= shortProp){
-    //             cout << properties[j].Name << " : " << shortProp << " : sal_Bool" << endl;
-    //         }
-    //         else if(any >>= boolProp){
-    //             cout << properties[j].Name << " : " << (boolProp ? "true" : "false") << " : sal_Bool" << endl;
-    //         } else {
-    //             cout << properties[j].Name << ":  " << OUStringToOString(any.getValueTypeName(),RTL_TEXTENCODING_UTF8) << endl;
-    //         }
-            
-    //     }
-    //     cout << endl << endl;
-    // }
-    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(4,0,4,1000);
-     xPropertySet = Reference<XPropertySet>(xCellRange, UNO_QUERY_THROW);
- 
-        //Reference<XFastPropertySet> xFastPropertySet(xPropertySet, UNO_QUERY_THROW);
-
-    Sequence<Property> properties =  xPropertySet->getPropertySetInfo()->getProperties();
-    long longProp;
-    for(int j = 0; j <  properties.getLength(); j++){
-        Any any = xPropertySet->getPropertyValue(properties[j].Name);
-        if (any >>= strProp){
-
-            cout << std::format("{} : {} : string", OUStringToOString(properties[j].Name, RTL_TEXTENCODING_UTF8).getStr(), OUStringToOString(strProp, RTL_TEXTENCODING_UTF8).getStr()) << endl;
-
-        }else if(any >>= shortProp){
-            cout << properties[j].Name << " : " << shortProp << " : sal_Bool" << endl;
-        }
-        else if(any >>= boolProp){
-            cout << properties[j].Name << " : " << (boolProp ? "true" : "false") << " : sal_Bool" << endl;
-        } else if(any >>= longProp){
-            cout << properties[j].Name << " : " << longProp << " : sal_Bool" << endl;
-        }else {
-            cout << properties[j].Name << ":  " << OUStringToOString(any.getValueTypeName(),RTL_TEXTENCODING_UTF8) << endl;
-        }
-        
-    }
-    cout << endl << endl;
-    long longNumFormat;
-    xPropertySet->getPropertyValue(OUString("NumberFormat")) >>= longNumFormat;
-    cout << "hello" <<endl;
-    xPropertySet = xNumberFormats->getByKey(longNumFormat);
-    properties =  xPropertySet->getPropertySetInfo()->getProperties();
-        cout << "hello" <<endl;
-    for(int j = 0; j <  properties.getLength(); j++){
-        Any any = xPropertySet->getPropertyValue(properties[j].Name);
-        if (any >>= strProp){
-
-            cout << std::format("{} : {} : string", OUStringToOString(properties[j].Name, RTL_TEXTENCODING_UTF8).getStr(), OUStringToOString(strProp, RTL_TEXTENCODING_UTF8).getStr()) << endl;
-
-        }else if(any >>= shortProp){
-            cout << properties[j].Name << " : " << shortProp << " : sal_Bool" << endl;
-        }
-        else if(any >>= boolProp){
-            cout << properties[j].Name << " : " << (boolProp ? "true" : "false") << " : sal_Bool" << endl;
-        } else if(any >>= longProp){
-            cout << properties[j].Name << " : " << longProp << " : sal_Bool" << endl;
-        }else {
-            cout << properties[j].Name << ":  " << OUStringToOString(any.getValueTypeName(),RTL_TEXTENCODING_UTF8) << endl;
-        }
-        
-    }
-    
-    
-}
-
-
-
 
 
 void set_row(Sequence<Any>& row, const Transaction trans ){
