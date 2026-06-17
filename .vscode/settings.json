@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "${workspaceFolder}/bin",
+            "binaryPath": "${workspaceFolder}/bin/Main",
+            "binaryArgs": []
+        }
+    ]
+}
