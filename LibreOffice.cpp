@@ -219,8 +219,6 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
             ++spreadsheet_index;
         }
         if(spreadsheet_index == xCellData.getLength()){
-            // index_length temp_index_length = {.index = spreadsheet_index + trans_add_index, .length = transactions.size() - trans_add_index};
-            // index_lengths.emplace_back(temp_index_length);
             index_lengths[index_lengths.size()-1].index = spreadsheet_index + trans_add_index;
             index_lengths[index_lengths.size()-1].length = transactions.size() - trans_add_index;
             break;
@@ -241,7 +239,6 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
     int trans_add_index = 0;
     for (int i = 0; i < index_lengths.size(); i++){
         for(int j = 0; j < index_lengths[i].length; j++){
-            //xCellData[index_lengths[i].index + j][0] <<= ((sys_days(transactions[trans_add_index++].date) - sys_days(year_month_day(year(1899), month(12), day(30)))).count());
             set_row(xCellData[index_lengths[i].index + j], transactions[trans_add_index++]);
         }
     }
