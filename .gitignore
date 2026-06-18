@@ -3,3 +3,6 @@ compile_commands.json
 bin/
 obj/
 pub/
+build/
+.qmlls.ini
+config.json

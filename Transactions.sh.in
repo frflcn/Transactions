@@ -1,0 +1,13 @@
+#!/bin/bash
+
+LD_LIBRARY_PATH=/usr/lib/libreoffice/sdk/lib:/usr/lib/libreoffice/program:.:${LD_LIBRARY_PATH}
+PATH=/usr/lib/libreoffice/sdk/bin:/usr/lib/libreoffice/program:${PATH}
+OFFICE_PROGRAM_PATH=/usr/lib/libreoffice/program
+UNO_PATH=/usr/lib/libreoffice/program
+export LD_LIBRARY_PATH
+export PATH
+export OFFICE_PROGRAM_PATH
+export UNO_PATH
+
+APP_DIR="$(dirname "$(realpath "$0")")"
+"$APP_DIR/Transactions" $@
