@@ -6,3 +6,4 @@ pub/
 build/
 .qmlls.ini
 config.json
+publish.sh
