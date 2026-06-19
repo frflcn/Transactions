@@ -1,6 +1,9 @@
 #include "PlaidJson.hpp"
 #include "LibreOffice.hpp"
 #include "PlaidAPI.hpp"
+#include "Config.hpp"
+
+#include <QCoreApplication>
 
 
 #include <iostream>
@@ -8,18 +11,24 @@
 
 
 using namespace std;
+using namespace Config;
+using namespace PlaidJson;
 
 int main(int argc, char* argv[]){
 
     cout << "Running..." << endl << endl;
 
-    plaid_initialize();
+    QCoreApplication app(argc, argv);
 
-    bool has_more = true;
-    while(has_more){
-        PlaidTransactionsResponse plaidTransResponse = call_transactions();
-        add_transactions(plaidTransResponse);
-        has_more = plaidTransResponse.has_more;
+    read_config();
+
+    for (Config::Account& account : config.accounts){
+        bool has_more = true;
+        while(has_more){
+            PlaidTransactionsResponse plaidTransResponse = call_transactions(account);
+            add_transactions(plaidTransResponse);
+            has_more = plaidTransResponse.has_more;
+        }
     }
 
 }

@@ -1,4 +1,5 @@
 #include "PlaidJson.hpp"
+#include "Config.hpp"
 
-PlaidTransactionsResponse call_transactions();
+PlaidJson::PlaidTransactionsResponse call_transactions(Config::Account& account);
 void plaid_initialize();

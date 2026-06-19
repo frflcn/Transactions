@@ -1,4 +1,5 @@
 #include "PlaidJson.hpp"
+#include "Config.hpp"
 
 #include <cppuhelper/bootstrap.hxx>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
@@ -15,6 +16,8 @@
 #include <com/sun/star/beans/XFastPropertySet.hpp>
 #include <com/sun/star/sheet/XCellSeries.hpp>
 
+#include <format>
+
 
 using namespace css;
 using namespace css;
@@ -26,6 +29,10 @@ using namespace beans;
 using namespace table;
 using namespace util;
 using namespace rtl;
+
+using namespace PlaidJson;
+
+Config::Config& config = Config::config; 
 
 
 static const int DATE_COLUMN                    = 0;
@@ -80,7 +87,7 @@ Reference<XSpreadsheet> get_spreadsheet(){
         loadProps[0].Name = OUString::createFromAscii("Hidden");
         loadProps[0].Value <<= true;
         Reference<XComponent> xSpreadsheetComponent = xComponentLoader->loadComponentFromURL(
-            "file:///home/trevor/MEGA/Finances/Transactions.ods", "_default", 0, loadProps);
+            OUString::createFromAscii(std::format("file://{}", config.transaction_file).c_str()), "_default", 0, loadProps);
         Reference<XSpreadsheetDocument> xSpreadsheetDoc(xSpreadsheetComponent, UNO_QUERY_THROW);
         Any sheet = xSpreadsheetDoc->getSheets()->getByName(OUString::createFromAscii("Fulton"));
 

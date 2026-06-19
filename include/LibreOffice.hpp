@@ -3,4 +3,4 @@
 #include "PlaidJson.hpp"
 
 
-void add_transactions(const PlaidTransactionsResponse response);
+void add_transactions(const PlaidJson::PlaidTransactionsResponse response);

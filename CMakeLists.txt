@@ -15,9 +15,11 @@ qt_add_executable(Transactions
     src/LibreOffice.cpp
     src/PlaidAPI.cpp
     src/PlaidJson.cpp
+    src/Config.cpp
     include/LibreOffice.hpp
     include/PlaidAPI.hpp
     include/PlaidJson.hpp
+    include/Config.hpp
 )
 
 

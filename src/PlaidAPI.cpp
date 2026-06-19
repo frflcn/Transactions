@@ -1,4 +1,5 @@
 #include "PlaidJson.hpp"
+#include "Config.hpp"
 
 #include <fstream>
 
@@ -10,33 +11,16 @@ using namespace cpr;
 using namespace std;
 using namespace nlohmann;
 
+using namespace Config;
+using namespace PlaidJson;
+
 
 string clientID;
 string productionSecret;
 
 
-void plaid_initialize(){
-    fstream file("/home/trevor/MEGA/Finances/Code/Transactions/plaid.json");
-    json j;
+PlaidTransactionsResponse call_transactions(Config::Account& account){
 
-    file >> j;
-
-    j.at("client_id").get_to(clientID);
-
-    j.at("production_secret").get_to(productionSecret);
-   
-}
-
-PlaidTransactionsResponse call_transactions(){
-
-    fstream file("/home/trevor/MEGA/Finances/Code/Transactions/fulton-plaid.json");
-    json jsend;
-    file >> jsend;
-
-    string cursor;
-    string accessToken;
-    jsend.at("cursor").get_to(cursor);
-    jsend.at("access_token").get_to(accessToken);
     PlaidTransactionsResponse response;
 
     Response r = Post(Url("https://production.plaid.com/transactions/sync"),
@@ -51,14 +35,11 @@ PlaidTransactionsResponse call_transactions(){
         "include_original_description" : true
     }}
 }}
-)", clientID, productionSecret, accessToken, cursor)));
+)", config.client_id, config.production_secret, account.access_token, account.cursor)));
 
 
-    file.seekp(0);
     
     if (r.status_code != 200){
-        jsend["cursor"] = "";
-        file << setw(4) << jsend;
         throw runtime_error(std::format("Error: Invalid Response From Plaid \nStatus Code: {}\n{}", r.status_code, r.text));
     }
 
@@ -66,10 +47,10 @@ PlaidTransactionsResponse call_transactions(){
 
 
     response = jresponse;
-    jsend["cursor"] = response.next_cursor;
 
-    file << setw(4) << jsend;
-    file.close();
+    account.cursor = response.next_cursor;
+    write_config();
+
     if (response.accounts.size() > 0 ){
         cout << "Available: " << response.accounts[0].balances.available << endl <<  "Current: " << response.accounts[0].balances.current << endl << endl;
     }
