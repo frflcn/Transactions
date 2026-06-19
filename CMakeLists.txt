@@ -11,10 +11,10 @@ find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Concurrent)
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(Transactions
-    Main.cpp
-    LibreOffice.cpp
-    PlaidAPI.cpp
-    PlaidJson.cpp
+    src/Main.cpp
+    src/LibreOffice.cpp
+    src/PlaidAPI.cpp
+    src/PlaidJson.cpp
     include/LibreOffice.hpp
     include/PlaidAPI.hpp
     include/PlaidJson.hpp
