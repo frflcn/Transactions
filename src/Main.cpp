@@ -26,7 +26,7 @@ int main(int argc, char* argv[]){
 
     for (Config::Account& account : config.accounts){
         
-        get_spreadsheet();
+        get_spreadsheet(account.name.c_str());
 
         bool has_more = true;
         while(has_more){

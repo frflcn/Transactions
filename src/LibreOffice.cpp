@@ -90,9 +90,9 @@ void get_spreadsheetdoc(){
     spreadsheetDoc= Reference<XSpreadsheetDocument>(xSpreadsheetComponent, UNO_QUERY_THROW);
 }
 
-void get_spreadsheet(){
+void get_spreadsheet(const char* accountName){
 
-        Any anySheet = spreadsheetDoc->getSheets()->getByName(OUString::createFromAscii("Fulton"));
+        Any anySheet = spreadsheetDoc->getSheets()->getByName(OUString::createFromAscii(accountName));
 
         spreadsheet = Reference<XSpreadsheet>(anySheet, UNO_QUERY_THROW);
 
