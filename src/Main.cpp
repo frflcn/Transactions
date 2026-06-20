@@ -22,7 +22,12 @@ int main(int argc, char* argv[]){
 
     read_config();
 
+    get_spreadsheetdoc();
+
     for (Config::Account& account : config.accounts){
+        
+        get_spreadsheet();
+
         bool has_more = true;
         while(has_more){
             PlaidTransactionsResponse plaidTransResponse = call_transactions(account);
@@ -30,5 +35,7 @@ int main(int argc, char* argv[]){
             has_more = plaidTransResponse.has_more;
         }
     }
+
+    teardown_libreoffice();
 
 }

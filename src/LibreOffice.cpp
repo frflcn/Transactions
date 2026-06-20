@@ -47,6 +47,9 @@ static const int LAST_COLUMN_INDEX              = 7;
 
 static const int START_ROW                      = 1;
 
+Reference<XSpreadsheetDocument> spreadsheetDoc;
+Reference<XSpreadsheet> spreadsheet;
+
 
 void set_row(Sequence<Any>& row, const Transaction trans );
 void modify_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
@@ -55,44 +58,49 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
 void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account);
 
 string cell_address_from_index(int row, int col);
-Reference<XSpreadsheet> get_spreadsheet();
 
 void add_transactions(PlaidTransactionsResponse response){
 
-        Reference<XSpreadsheet> xSpreadsheet = get_spreadsheet();
+        modify_rows(spreadsheet, response.modified);
 
-        modify_rows(xSpreadsheet, response.modified);
-
-
-        delete_rows(xSpreadsheet, response.removed);
-        insert_rows(xSpreadsheet, response.added);
+        delete_rows(spreadsheet, response.removed);
+        insert_rows(spreadsheet, response.added);
 
         if (response.accounts.size() > 0){
-            add_balance(xSpreadsheet, response.accounts[0]);
+            add_balance(spreadsheet, response.accounts[0]);
         }
 
 }
 
-Reference<XSpreadsheet> get_spreadsheet(){
-        Reference<XComponentContext> xContext(cppu::bootstrap());
-        Reference<css::lang::XMultiComponentFactory> xMCF = xContext->getServiceManager();
-        Reference<XInterface> oDesktop = xMCF->createInstanceWithContext(
-            "com.sun.star.frame.Desktop", xContext);
-        Reference<XComponentLoader> xComponentLoader
-            = Reference<XComponentLoader>(oDesktop, UNO_QUERY_THROW);
+void get_spreadsheetdoc(){
+    Reference<XComponentContext> xContext(cppu::bootstrap());
+    Reference<css::lang::XMultiComponentFactory> xMCF = xContext->getServiceManager();
+    Reference<XInterface> oDesktop = xMCF->createInstanceWithContext(
+        "com.sun.star.frame.Desktop", xContext);
+    Reference<XComponentLoader> xComponentLoader
+        = Reference<XComponentLoader>(oDesktop, UNO_QUERY_THROW);
 
-        Sequence<PropertyValue> loadProps(1);
-
-
-        loadProps[0].Name = OUString::createFromAscii("Hidden");
-        loadProps[0].Value <<= true;
-        Reference<XComponent> xSpreadsheetComponent = xComponentLoader->loadComponentFromURL(
-            OUString::createFromAscii(std::format("file://{}", config.transaction_file).c_str()), "_default", 0, loadProps);
-        Reference<XSpreadsheetDocument> xSpreadsheetDoc(xSpreadsheetComponent, UNO_QUERY_THROW);
-        Any sheet = xSpreadsheetDoc->getSheets()->getByName(OUString::createFromAscii("Fulton"));
+    Sequence<PropertyValue> loadProps(1);
 
 
-        return Reference<XSpreadsheet>(sheet, UNO_QUERY_THROW);
+    loadProps[0].Name = OUString::createFromAscii("Hidden");
+    loadProps[0].Value <<= true;
+    Reference<XComponent> xSpreadsheetComponent = xComponentLoader->loadComponentFromURL(
+        OUString::createFromAscii(std::format("file://{}", config.transaction_file).c_str()), "_default", 0, loadProps);
+    spreadsheetDoc= Reference<XSpreadsheetDocument>(xSpreadsheetComponent, UNO_QUERY_THROW);
+}
+
+void get_spreadsheet(){
+
+        Any anySheet = spreadsheetDoc->getSheets()->getByName(OUString::createFromAscii("Fulton"));
+
+        spreadsheet = Reference<XSpreadsheet>(anySheet, UNO_QUERY_THROW);
+
+}
+
+void teardown_libreoffice(){
+    spreadsheet.clear();
+    spreadsheetDoc.clear();
 }
 
 string cell_address_from_index(int row, int col){
