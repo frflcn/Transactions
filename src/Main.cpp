@@ -20,6 +20,9 @@ int main(int argc, char* argv[]){
 
     QCoreApplication app(argc, argv);
 
+    #ifndef NDEBUG
+    parser.addOption(startFresh);
+    #endif
     parser.addHelpOption();
     parser.process(app);
 
@@ -30,6 +33,10 @@ int main(int argc, char* argv[]){
     get_spreadsheetdoc();
 
     for (Config::Account& account : config.accounts){
+
+        #ifndef NDEBUG
+        if (parser.isSet(startFresh)) account.cursor = "";
+        #endif
         
         get_spreadsheet(account.name.c_str());
 

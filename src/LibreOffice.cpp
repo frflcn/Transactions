@@ -1,5 +1,6 @@
 #include "PlaidJson.hpp"
 #include "Config.hpp"
+#include "Parser.hpp"
 
 #include <cppuhelper/bootstrap.hxx>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
@@ -95,6 +96,26 @@ void get_spreadsheet(const char* accountName){
         Any anySheet = spreadsheetDoc->getSheets()->getByName(OUString::createFromAscii(accountName));
 
         spreadsheet = Reference<XSpreadsheet>(anySheet, UNO_QUERY_THROW);
+
+        #ifndef NDEBUG
+        if (parser.isSet(startFresh)){
+            Reference<XUsedAreaCursor> usedCursor(spreadsheet->createCursor(), UNO_QUERY_THROW);
+            usedCursor->gotoEndOfUsedArea(true);
+            Reference<XCellRangeAddressable> xAddr(usedCursor, UNO_QUERY_THROW);
+            CellRangeAddress addr = xAddr->getRangeAddress();
+            Reference<XCellRange> xCellRange = spreadsheet->getCellRangeByPosition(0, START_ROW, LAST_COLUMN_INDEX, addr.EndRow);
+            cout << "Endrow: " << addr.EndRow << endl;
+            Reference<XCellRangeData> xCellRangeData(xCellRange, UNO_QUERY_THROW);
+            Sequence<Sequence<Any>> data = xCellRangeData->getDataArray();
+            for (Sequence<Any>& row : data){
+                for(Any& cell : row){
+                    cell <<= OUString::createFromAscii("");
+                }
+            }
+            xCellRangeData->setDataArray(data);
+            cout << "Spreadsheet is starting fresh" << endl;
+        }
+        #endif
 
 }
 
