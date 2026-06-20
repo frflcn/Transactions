@@ -2,8 +2,10 @@
 #include "LibreOffice.hpp"
 #include "PlaidAPI.hpp"
 #include "Config.hpp"
+#include "Parser.hpp"
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
 
 
 #include <iostream>
@@ -16,9 +18,12 @@ using namespace PlaidJson;
 
 int main(int argc, char* argv[]){
 
-    cout << "Running..." << endl << endl;
-
     QCoreApplication app(argc, argv);
+
+    parser.addHelpOption();
+    parser.process(app);
+
+    cout << "Running..." << endl << endl;
 
     read_config();
 

@@ -20,6 +20,7 @@ qt_add_executable(Transactions
     include/PlaidAPI.hpp
     include/PlaidJson.hpp
     include/Config.hpp
+    include/Parser.hpp
 )
 
 
