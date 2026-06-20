@@ -9,10 +9,10 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/Main",
+            "program": "${workspaceFolder}/bin/Transactions",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [ 
                 {
                     "name": "LD_LIBRARY_PATH",
