@@ -57,6 +57,7 @@ void modify_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
 void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTransaction> transactions);
 void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> transactions);
 void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account);
+sal_Int32 get_end_row();
 
 string cell_address_from_index(int row, int col);
 
@@ -99,20 +100,19 @@ void get_spreadsheet(const char* accountName){
 
         #ifndef NDEBUG
         if (parser.isSet(startFresh)){
-            Reference<XUsedAreaCursor> usedCursor(spreadsheet->createCursor(), UNO_QUERY_THROW);
-            usedCursor->gotoEndOfUsedArea(true);
-            Reference<XCellRangeAddressable> xAddr(usedCursor, UNO_QUERY_THROW);
-            CellRangeAddress addr = xAddr->getRangeAddress();
-            Reference<XCellRange> xCellRange = spreadsheet->getCellRangeByPosition(0, START_ROW, LAST_COLUMN_INDEX, addr.EndRow);
-            cout << "Endrow: " << addr.EndRow << endl;
-            Reference<XCellRangeData> xCellRangeData(xCellRange, UNO_QUERY_THROW);
-            Sequence<Sequence<Any>> data = xCellRangeData->getDataArray();
-            for (Sequence<Any>& row : data){
-                for(Any& cell : row){
-                    cell <<= OUString::createFromAscii("");
+            sal_Int32 endRow = get_end_row();
+            if (endRow > 0){
+                Reference<XCellRange> xCellRange = spreadsheet->getCellRangeByPosition(0, START_ROW, LAST_COLUMN_INDEX, endRow);
+                Reference<XCellRangeData> xCellRangeData(xCellRange, UNO_QUERY_THROW);
+                Sequence<Sequence<Any>> data = xCellRangeData->getDataArray();
+                for (Sequence<Any>& row : data){
+                    for(Any& cell : row){
+                        cell <<= OUString::createFromAscii("");
+                    }
                 }
+                xCellRangeData->setDataArray(data);
             }
-            xCellRangeData->setDataArray(data);
+ 
             cout << "Spreadsheet is starting fresh" << endl;
         }
         #endif
@@ -141,12 +141,7 @@ void add_balance(Reference<XSpreadsheet> xSpreadsheet, Account account){
     Reference<XCell> xCell = xSpreadsheet->getCellByPosition(ACCOUNT_BALANCE_COLUMN, START_ROW);
     OUString formula = OUString::createFromAscii(std::format("={} - {}", cell_address_from_index(START_ROW - 1, ACCOUNT_BALANCE_COLUMN), cell_address_from_index(START_ROW - 1, AMOUNT_COLUMN)).c_str());
     xCell->setFormula(formula);
-    Reference<XSheetCellCursor> xSheetCellCursor = xSpreadsheet->createCursor();
-    Reference<XUsedAreaCursor> xUsedCursor(xSheetCellCursor, UNO_QUERY_THROW);
-    xUsedCursor->gotoEndOfUsedArea(true);
-    Reference<XCellRangeAddressable> xAddr(xUsedCursor, UNO_QUERY_THROW);
-    CellRangeAddress addr = xAddr->getRangeAddress();
-    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(ACCOUNT_BALANCE_COLUMN, START_ROW, ACCOUNT_BALANCE_COLUMN, addr.EndRow);
+    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(ACCOUNT_BALANCE_COLUMN, START_ROW, ACCOUNT_BALANCE_COLUMN, get_end_row());
     Reference<XSheetCellRange> xSheetCellRange(xCellRange, UNO_QUERY_THROW);
     Reference<XCellSeries> xCellSeries(xSheetCellRange, UNO_QUERY_THROW);
     xCellSeries->fillAuto(FillDirection_TO_BOTTOM, 1);
@@ -166,16 +161,8 @@ void modify_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<Transaction>
 }
 
 void delete_rows(Reference<XSpreadsheet> xSpreadsheet, const vector<RemovedTransaction> transactions){
-    Reference<XSheetCellCursor> xCursor = xSpreadsheet->createCursor();
-    Reference<XUsedAreaCursor> xUsedCursor(xCursor, UNO_QUERY_THROW);
-
-    xUsedCursor->gotoEndOfUsedArea(true);
-
-    // Get the position of the last used cell
-    Reference<XCellRangeAddressable> xAddr(xUsedCursor, UNO_QUERY_THROW);
-    CellRangeAddress addr = xAddr->getRangeAddress();
     
-    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,addr.EndRow);
+    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,get_end_row());
     Reference<XCellRangeData> xCellRangeData(xCellRange, UNO_QUERY_THROW);
     Sequence<Sequence<Any>> xCellData = xCellRangeData->getDataArray();
     vector<int> delete_me_indexes = vector<int>();
@@ -212,12 +199,8 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
  
 
     //Get Data From Spreadsheet
-    Reference<XSheetCellCursor> xCursor = xSpreadsheet->createCursor();
-    Reference<XUsedAreaCursor> xUsedCursor(xCursor, UNO_QUERY_THROW);
-    xUsedCursor->gotoEndOfUsedArea(true);
-    Reference<XCellRangeAddressable> xAddr(xUsedCursor, UNO_QUERY_THROW);
-    CellRangeAddress addr = xAddr->getRangeAddress();
-    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,addr.EndRow);
+    sal_Int32 endRow = get_end_row();
+    Reference<XCellRange> xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,endRow);
     Reference<XCellRangeData> xCellRangeData(xCellRange, UNO_QUERY_THROW);
     Sequence<Sequence<Any>> xCellData = xCellRangeData->getDataArray();
 
@@ -270,7 +253,7 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
     }
 
     //Fill Empty Rows
-    xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,addr.EndRow + transactions.size());
+    xCellRange = xSpreadsheet->getCellRangeByPosition(0,0,LAST_COLUMN_INDEX,endRow + transactions.size());
     xCellRangeData = Reference<XCellRangeData>(xCellRange, UNO_QUERY_THROW);
     xCellData = xCellRangeData->getDataArray();
     int trans_add_index = 0;
@@ -297,4 +280,13 @@ void set_row(Sequence<Any>& row, const Transaction trans ){
     row[PENDING_COLUMN] <<= sal_Int32(trans.pending);
     row[TRANSACTION_ID_COLUMN] <<= OUString::createFromAscii(trans.transaction_id.c_str());
     row[ORIGINAL_DESCRIPTION_COLUMN] <<= OUString::createFromAscii(trans.original_description.c_str());
+}
+
+sal_Int32 get_end_row(){
+    Reference<XSheetCellCursor> xCursor = spreadsheet->createCursor();
+    Reference<XUsedAreaCursor> xUsedCursor(xCursor, UNO_QUERY_THROW);
+    xUsedCursor->gotoEndOfUsedArea(true);
+    Reference<XCellRangeAddressable> xAddr(xUsedCursor, UNO_QUERY_THROW);
+    CellRangeAddress addr = xAddr->getRangeAddress();
+    return addr.EndRow;
 }
