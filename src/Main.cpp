@@ -21,6 +21,7 @@ int main(int argc, char* argv[]){
 
     QCoreApplication app(argc, argv);
 
+    parser.addOption(categorizeAll);
     #ifndef NDEBUG
     parser.addOption(startFresh);
     #endif
@@ -42,6 +43,10 @@ int main(int argc, char* argv[]){
         #endif
         
         get_spreadsheet(account.name.c_str());
+
+        if (parser.isSet(categorizeAll)){
+            categorize_all();
+        }
 
         bool has_more = true;
         while(has_more){

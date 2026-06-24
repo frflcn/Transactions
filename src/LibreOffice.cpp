@@ -78,6 +78,45 @@ void add_transactions(PlaidTransactionsResponse response){
 
 }
 
+void categorize_all(){
+    Reference<XCellRange>cellRange = spreadsheet->getCellRangeByPosition(0, START_ROW, LAST_COLUMN_INDEX, get_end_row());
+    Reference<XCellRangeData>dataRange(cellRange, UNO_QUERY_THROW);
+    Sequence<Sequence<Any>> data = dataRange->getDataArray();
+
+    for (Sequence<Any>& row : data){
+        Transaction transaction;
+
+        double amount;
+        double date;
+        OUString transaction_id;
+        OUString original_description;
+        OUString name;
+        OUString merchant_name;
+        row[DATE_COLUMN]                    >>= date;
+        row[AMOUNT_COLUMN]                  >>= amount;
+        row[PENDING_COLUMN]                 >>= transaction.pending;
+        row[TRANSACTION_ID_COLUMN]          >>= transaction_id;
+        row[ORIGINAL_DESCRIPTION_COLUMN]    >>= original_description;
+        row[NAME_COLUMN]                    >>= name;
+        row[MERCHANT_NAME_COLUMN]           >>= merchant_name;
+
+        transaction.date   = sys_days(days((int)date) + sys_days(year_month_day(year(1899), month(12), day(30))).time_since_epoch());
+        transaction.amount = Decimal(std::format("{:.2f}", amount));        
+        transaction.transaction_id = OUStringToOString(transaction_id, RTL_TEXTENCODING_UTF8).getStr();
+        transaction.original_description = OUStringToOString(original_description, RTL_TEXTENCODING_UTF8).getStr();
+        transaction.name = OUStringToOString(name, RTL_TEXTENCODING_UTF8).getStr();
+        transaction.merchant_name = OUStringToOString(merchant_name, RTL_TEXTENCODING_UTF8).getStr();
+
+
+        hs_categorize(transaction);
+
+        row[STORE_COLUMN] <<= OUString::createFromAscii(transaction.store.c_str());
+        row[CATEGORY_COLUMN] <<= OUString::createFromAscii(transaction.category.c_str());
+        row[SUBCATEGORY_COLUMN] <<= OUString::createFromAscii(transaction.subcategory.c_str());
+    }
+    dataRange->setDataArray(data);
+}
+
 void get_spreadsheetdoc(){
     Reference<XComponentContext> xContext(cppu::bootstrap());
     Reference<css::lang::XMultiComponentFactory> xMCF = xContext->getServiceManager();

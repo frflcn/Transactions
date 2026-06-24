@@ -76,6 +76,42 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Categorize All",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Transactions",
+            "args": ["--categorize-all"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [ 
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/usr/lib/libreoffice/sdk/lib:/usr/lib/libreoffice/program:.:${env:LD_LIBRARY_PATH}"
+                },
+                {
+                    "name": "PATH",
+                    "value": "/usr/lib/libreoffice/sdk/bin:/usr/lib/libreoffice/program:${env:PATH}"
+                },
+                {
+                    "name": "UNO_PATH",
+                    "value": "/usr/lib/libreoffice/program"
+                }],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
         }
 
 
