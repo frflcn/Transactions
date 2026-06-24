@@ -16,11 +16,14 @@ qt_add_executable(Transactions
     src/PlaidAPI.cpp
     src/PlaidJson.cpp
     src/Config.cpp
+    src/Categorize.cpp
     include/LibreOffice.hpp
     include/PlaidAPI.hpp
     include/PlaidJson.hpp
     include/Config.hpp
     include/Parser.hpp
+    include/Categorize.hpp
+    include/Categories.hpp
 )
 
 
@@ -47,6 +50,7 @@ target_link_libraries(Transactions
     PRIVATE curl
     PRIVATE mpdec++
     PRIVATE mpdec
+    PRIVATE hs
 )
 
 include(GNUInstallDirs)

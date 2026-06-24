@@ -27,6 +27,11 @@ namespace PlaidJson {
         bool pending;
         string transaction_id;
         string original_description;
+
+        string store;
+        string category;
+        string subcategory;
+
         friend ostream& operator<<(ostream& os, const Transaction& t);
 
     };

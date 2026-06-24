@@ -1,6 +1,7 @@
 #include "PlaidJson.hpp"
 #include "Config.hpp"
 #include "Parser.hpp"
+#include "Categorize.hpp"
 
 #include <cppuhelper/bootstrap.hxx>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
@@ -37,14 +38,17 @@ Config::Config& config = Config::config;
 
 
 static const int DATE_COLUMN                    = 0;
-static const int NAME_COLUMN                    = 1;
-static const int MERCHANT_NAME_COLUMN           = 2;
-static const int AMOUNT_COLUMN                  = 3;
-static const int ACCOUNT_BALANCE_COLUMN         = 4;
-static const int PENDING_COLUMN                 = 5;
-static const int TRANSACTION_ID_COLUMN          = 6;
-static const int ORIGINAL_DESCRIPTION_COLUMN    = 7;
-static const int LAST_COLUMN_INDEX              = 7;
+static const int STORE_COLUMN                   = 1;
+static const int CATEGORY_COLUMN                = 2;
+static const int SUBCATEGORY_COLUMN             = 3;
+static const int AMOUNT_COLUMN                  = 4;
+static const int ACCOUNT_BALANCE_COLUMN         = 5;
+static const int PENDING_COLUMN                 = 6;
+static const int NAME_COLUMN                    = 7;
+static const int MERCHANT_NAME_COLUMN           = 8;
+static const int ORIGINAL_DESCRIPTION_COLUMN    = 9;
+static const int TRANSACTION_ID_COLUMN          = 10;
+static const int LAST_COLUMN_INDEX              = 10;
 
 static const int START_ROW                      = 1;
 
@@ -273,13 +277,19 @@ void insert_rows(Reference<XSpreadsheet> xSpreadsheet, vector<Transaction> trans
 
 
 void set_row(Sequence<Any>& row, const Transaction trans ){
+    
     row[DATE_COLUMN] <<= static_cast<double>((sys_days(trans.date) - sys_days(year_month_day(year(1899), month(12), day(30)))).count());
+    row[STORE_COLUMN] <<= OUString::createFromAscii(trans.store.c_str());
+    row[CATEGORY_COLUMN] <<= OUString::createFromAscii(trans.category.c_str());
+    row[SUBCATEGORY_COLUMN] <<= OUString::createFromAscii(trans.subcategory.c_str());
+    row[AMOUNT_COLUMN] <<= std::stod(trans.amount.to_sci());
+    //BALANCE_COLUMN
+    row[PENDING_COLUMN] <<= sal_Int32(trans.pending);
     row[NAME_COLUMN] <<= OUString::createFromAscii(trans.name.c_str());
     row[MERCHANT_NAME_COLUMN] <<= OUString::createFromAscii(trans.merchant_name.c_str());
-    row[AMOUNT_COLUMN] <<= std::stod(trans.amount.to_sci());
-    row[PENDING_COLUMN] <<= sal_Int32(trans.pending);
-    row[TRANSACTION_ID_COLUMN] <<= OUString::createFromAscii(trans.transaction_id.c_str());
     row[ORIGINAL_DESCRIPTION_COLUMN] <<= OUString::createFromAscii(trans.original_description.c_str());
+    row[TRANSACTION_ID_COLUMN] <<= OUString::createFromAscii(trans.transaction_id.c_str());
+
 }
 
 sal_Int32 get_end_row(){
