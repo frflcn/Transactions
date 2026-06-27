@@ -1,3 +1,4 @@
+#include "LibreOffice.hpp"
 #include "PlaidJson.hpp"
 #include "Config.hpp"
 #include "Parser.hpp"
@@ -122,15 +123,14 @@ void get_spreadsheetdoc(){
     Reference<css::lang::XMultiComponentFactory> xMCF = xContext->getServiceManager();
     Reference<XInterface> oDesktop = xMCF->createInstanceWithContext(
         "com.sun.star.frame.Desktop", xContext);
-    Reference<XComponentLoader> xComponentLoader
-        = Reference<XComponentLoader>(oDesktop, UNO_QUERY_THROW);
+    componentLoader = Reference<XComponentLoader>(oDesktop, UNO_QUERY_THROW);
 
     Sequence<PropertyValue> loadProps(1);
 
 
     loadProps[0].Name = OUString::createFromAscii("Hidden");
     loadProps[0].Value <<= true;
-    Reference<XComponent> xSpreadsheetComponent = xComponentLoader->loadComponentFromURL(
+    Reference<XComponent> xSpreadsheetComponent = componentLoader->loadComponentFromURL(
         OUString::createFromAscii(std::format("file://{}", config.transaction_file).c_str()), "_default", 0, loadProps);
     spreadsheetDoc= Reference<XSpreadsheetDocument>(xSpreadsheetComponent, UNO_QUERY_THROW);
 }
@@ -165,6 +165,7 @@ void get_spreadsheet(const char* accountName){
 void teardown_libreoffice(){
     spreadsheet.clear();
     spreadsheetDoc.clear();
+    componentLoader.clear();
 }
 
 string cell_address_from_index(int row, int col){
