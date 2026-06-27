@@ -24,6 +24,7 @@ qt_add_executable(Transactions
     include/Parser.hpp
     include/Categorize.hpp
     include/Categories.hpp
+    include/Run.hpp
 )
 
 

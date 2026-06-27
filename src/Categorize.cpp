@@ -49,6 +49,9 @@ int call_back(unsigned int id, unsigned long long from, unsigned long long to, u
     if (category.checkMoreThanAmount && stod(trans->amount.to_sci()) <= category.moreThanAmount){
         return 0;
     }
+    if(category.func != NULL && !category.func(*trans, id, from, to)){
+        return 0;
+    }
 
     trans->store = category.store;
     trans->subcategory = category.subcategory;
