@@ -7,5 +7,4 @@ build/
 .qmlls.ini
 config.json
 publish.sh
-/include/Categories.hpp
-/include/Run.hpp
+
