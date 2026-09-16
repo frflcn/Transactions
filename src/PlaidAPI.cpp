@@ -49,7 +49,6 @@ PlaidTransactionsResponse call_transactions(Config::Account& account){
     response = jresponse;
 
     account.cursor = response.next_cursor;
-    write_config();
 
     if (response.accounts.size() > 0 ){
         cout << "Available: " << response.accounts[0].balances.available << endl <<  "Current: " << response.accounts[0].balances.current << endl << endl;

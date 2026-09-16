@@ -59,7 +59,9 @@ int main(int argc, char* argv[]){
 
             add_transactions(plaidTransResponse);
             has_more = plaidTransResponse.has_more;
+
         }
+        write_config();
     }
 
     teardown_libreoffice();
