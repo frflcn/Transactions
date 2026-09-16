@@ -61,6 +61,7 @@ int main(int argc, char* argv[]){
             has_more = plaidTransResponse.has_more;
 
         }
+        save_spreadsheetdoc();
         write_config();
     }
 

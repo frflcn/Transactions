@@ -7,6 +7,7 @@
 #include <cppuhelper/bootstrap.hxx>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
 #include <com/sun/star/frame/XComponentLoader.hpp>
+#include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/sheet/XSpreadsheetDocument.hpp>
 #include <com/sun/star/sheet/XSpreadsheet.hpp>
 #include <com/sun/star/table/CellRangeAddress.hpp>
@@ -55,6 +56,7 @@ static const int START_ROW                      = 1;
 
 Reference<XSpreadsheetDocument> spreadsheetDoc;
 Reference<XSpreadsheet> spreadsheet;
+Reference<XStorable> xStorable;
 
 
 void set_row(Sequence<Any>& row, const Transaction trans );
@@ -133,6 +135,11 @@ void get_spreadsheetdoc(){
     Reference<XComponent> xSpreadsheetComponent = componentLoader->loadComponentFromURL(
         OUString::createFromAscii(std::format("file://{}", config.transaction_file).c_str()), "_default", 0, loadProps);
     spreadsheetDoc= Reference<XSpreadsheetDocument>(xSpreadsheetComponent, UNO_QUERY_THROW);
+    xStorable = Reference<XStorable>(spreadsheetDoc, UNO_QUERY_THROW);
+}
+
+void save_spreadsheetdoc(){
+    xStorable->store();
 }
 
 void get_spreadsheet(const char* accountName){
@@ -166,6 +173,7 @@ void teardown_libreoffice(){
     spreadsheet.clear();
     spreadsheetDoc.clear();
     componentLoader.clear();
+    xStorable.clear();
 }
 
 string cell_address_from_index(int row, int col){
